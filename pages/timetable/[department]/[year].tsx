@@ -1,10 +1,11 @@
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
-const TimeTable: NextPage = () => {
+const TimeTable: NextPage = ({ data }: { data: any }) => {
     const router = useRouter();
     const { department, year } = router.query;
+    console.log(data);
     return (
         <>
             <Head>
@@ -13,10 +14,8 @@ const TimeTable: NextPage = () => {
                 </title>
                 <meta name='viewport' content='initial-scale=1.0, width=device-width' />
             </Head>
-            <div className='bg-[#fafafa]  m-16 p-16 shadow-main'>
-                <h1 className='text-5xl leading-none mt-0 mb-1 uppercase'>
-                    Time Table for {department} {3}
-                </h1>
+            <div className='bg-[#fafafa]  m-16 p-16  shadow-main'>
+                <h1 className='text-5xl leading-none mt-0 mb-1 uppercase'>{data.name}</h1>
                 <div className='flex flex-col gap-4 my-6'>
                     <div className='flex flex-row gap-2 divide-stone-300 divide-x-2  '>
                         <div className='grid grid-cols-1 divide-stone-300 divide-y-2 w-16'>
@@ -30,8 +29,8 @@ const TimeTable: NextPage = () => {
                             <div className='h-16 flex items-center justify-center'>FRI</div>
                             <div className='h-16 flex items-center justify-center'>SAT</div>
                         </div>
-                        <div className='relative w-full px-1 grid grid-cols-1  divide-stone-300 divide-y-2'>
-                            <div className='flex w-full justify-between border-b-[3px] border-b-stone-300 h-7'>
+                        <div className='relative w-full px-1 grid grid-cols-1  divide-stone-300 divide-y-2 overflow-x-auto'>
+                            <div className='flex w-[756px]  justify-between border-b-[3px] border-b-stone-300 h-7'>
                                 <span> 9am </span> <span> 10am </span> <span> 11am </span>
                                 <span> 12am </span>
                                 <span> 1pm </span> <span> 2pm </span> <span> 3pm </span>
@@ -84,6 +83,17 @@ const TimeTable: NextPage = () => {
             </div>
         </>
     );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { year, department } = context.query;
+    const res = await fetch(
+        `http://localhost:3000/api/timetable?year=${year}&department=${department}`
+    );
+    const data = await res.json();
+    return {
+        props: { data },
+    };
 };
 
 export default TimeTable;
